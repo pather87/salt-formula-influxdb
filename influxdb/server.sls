@@ -1,18 +1,22 @@
 {%- from "influxdb/map.jinja" import server with context %}
-{% from "linux/map.jinja" import system with context %}
+
+{% if grains['os'] == 'Debian' %}
+influxdb_repo:
+  pkgrepo.managed:
+    - humanname: influxdb
+    - name: deb https://repos.influxdata.com/debian {{ grains['lsb_distrib_codename'] }} stable
+    - file: /etc/apt/sources.list.d/influxdb.list
+    - key_url: https://repos.influxdata.com/influxdb.key
+{% endif %}
 
 {%- if server.enabled %}
 
-linux_packages:
-  pkg.installed:
-    - pkgs: {{ system.pkgs }}
-
-include:
-  - linux.system.repo
 
 influxdb_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
+  - require:
+    - pkgrepo: influxdb_repo
 
 influxdb_config:
   file.managed:
