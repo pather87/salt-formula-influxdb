@@ -30,6 +30,13 @@ default:
   meta:
     enabled: true
     dir: '/var/lib/influxdb/meta'
+  collectd:
+    enabled: false
+    bind:
+      address: 0.0.0.0
+      port: 25826
+    database: collectd
+    typesdb: '/usr/local/share/collectd'
 {%- endload %}
 
 {%- set server = salt['grains.filter_by'](base_defaults, merge=salt['pillar.get']('influxdb:server')) %}
